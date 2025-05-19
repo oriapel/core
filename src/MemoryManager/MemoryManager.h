@@ -63,13 +63,13 @@ public:
      */
     void ValidateAllFields();
 
+    
+private:
     /**
      * This function calculate the checksum of field.
-     * DID NOT ACTUALLY USED IT! can add if have time
      */
     uint8_t CalculateFieldChecksum(const std::string &field) const;
 
-private:
     /**
      * This function gets an index of field, and return the field's size
      */
