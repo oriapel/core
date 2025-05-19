@@ -89,6 +89,57 @@ TEST(SimpleTest, ReadEmptyField) {
     }
 }
 
+TEST(simpleTest, WriteFieldThenInitialize) {
+    std::string aaaa {"aaaa"};
+    std::string aaaa2{};
+    std::string emptyStr {"####"};
+    ASSERT_TRUE(memoryManager.WriteField(0, aaaa) == ErrorCode::ERR_OK);
+    ASSERT_TRUE(memoryManager.InitalizeAllFields() == ErrorCode::ERR_OK);
+    ASSERT_TRUE(memoryManager.ReadField(0, aaaa2) == ErrorCode::ERR_OK);
+
+    for (size_t i = 0; i < aaaa2.size(); i++)
+    {
+        ASSERT_EQ(emptyStr[i], aaaa2[i]);
+    }
+}
+TEST(simpleTest, WriteFieldThenInitializeThenWrite) {
+    std::string aaaa {"aaaaaa"};
+    std::string bbbb {"bbbbbb"};
+    std::string aaaa2{};
+    std::string emptyStr {"######"};
+    ASSERT_TRUE(memoryManager.WriteField(1, aaaa) == ErrorCode::ERR_OK);
+    ASSERT_TRUE(memoryManager.InitalizeAllFields() == ErrorCode::ERR_OK);
+    ASSERT_TRUE(memoryManager.WriteField(1, bbbb) == ErrorCode::ERR_OK);
+    ASSERT_TRUE(memoryManager.ReadField(1, aaaa2) == ErrorCode::ERR_OK);
+
+    for (size_t i = 0; i < aaaa2.size(); i++)
+    {
+        ASSERT_EQ(bbbb[i], aaaa2[i]);
+    }
+}
+
+TEST(simpleTest, TestCorruptedField) {
+    std::string aaaa {"aaaa"};
+    std::string bbbb {"bbbb"};
+    std::string aaaa2{};
+    std::string emptyStr {"######"};
+    ASSERT_TRUE(memoryManager.WriteField(0, aaaa) == ErrorCode::ERR_OK);
+    for (size_t i = 0; i < aaaa2.size(); i++)
+    {
+        ASSERT_EQ(aaaa[i], aaaa2[i]);
+    }
+    ASSERT_TRUE(memoryManager.WriteField(0, bbbb, true, true) == ErrorCode::ERR_OK);
+    // Validate all fields also restores the corrupted field
+    memoryManager.ValidateAllFields();
+    ASSERT_TRUE(memoryManager.ReadField(0, aaaa) == ErrorCode::ERR_OK);;
+
+    for (size_t i = 0; i < aaaa2.size(); i++)
+    {
+        ASSERT_EQ(aaaa[i], aaaa2[i]);
+    }
+}
+
+
 
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);

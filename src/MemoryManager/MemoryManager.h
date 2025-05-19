@@ -35,12 +35,12 @@ public:
     /**
      * The function reads from the file into o_buff
      */
-    virtual ErrorCode ReadField(const uint32_t index, std::string& o_buff);
+    virtual ErrorCode ReadField(const uint32_t index, std::string& o_buff, bool validateChecksum = true);
     /**
      * The function write to the file the content of buff.
      * DO NOT CHECK DATA INTEGRITY! I just added it so later I can add it fully, not interesting for now
      */
-    virtual ErrorCode WriteField(const uint32_t index, const std::string& buff, bool backup = true);
+    virtual ErrorCode WriteField(const uint32_t index, const std::string& buff, bool backup = true, bool doNotFinishWritingFlag = false);
     /**
      * The funciton fill the memory of field in the file with zeros
      */

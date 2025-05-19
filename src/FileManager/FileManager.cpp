@@ -27,6 +27,7 @@ ErrorCode FileManager::Read(const uint32_t offset, const uint32_t length, std::s
         return res;
     }
 
+    o_buff.resize(length + 1); // +1 for null termination
     o_buff[length] = 0;
     m_file.read(&o_buff[0], length);
 
@@ -60,6 +61,6 @@ ErrorCode FileManager::Write(const uint32_t offset, const uint32_t length, const
 
 ErrorCode FileManager::Erase(const uint32_t offset, const uint32_t length)
 {
-    std::string emptyBuff(length, '0');
+    std::string emptyBuff(length, '#');
     return this->Write(offset, length, emptyBuff);
 }

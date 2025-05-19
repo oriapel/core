@@ -4,6 +4,8 @@
 #include "../ErrorCodes.h"
 #include <string>
 
+// This class will assume that all of the paramters are valid!
+// should only be called from the MemoryManager class after validating the parameters
 class IFileManager
 {
 public:
@@ -16,7 +18,7 @@ public:
      */
     virtual ErrorCode Write(const uint32_t offset, const uint32_t length, const std::string& buff) = 0;
     /**
-     * The funciton fill the memory of  in the file with zeros
+     * The funciton fill the memory of file with '#'
      */
     virtual ErrorCode Erase(const uint32_t offset, const uint32_t length) = 0;
 };

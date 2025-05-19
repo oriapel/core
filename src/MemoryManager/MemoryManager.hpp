@@ -61,6 +61,7 @@ void MemoryManager<N>::ValidateAllFields()
             if (invalidFieldsCounter == 1)
             {
                 this->RestoreField(i);
+                printf("Restored field %u!\n", i);
                 // Can also assume that there can only be one curropted file and break here
             }
             else
@@ -79,13 +80,13 @@ ErrorCode MemoryManager<N>::RestoreField(const uint32_t index)
 
     // Read backed up field from designated location
     ErrorCode res = ErrorCode::ERR_OK;
-    res = this->ReadField(this->m_allFileFields.size(), currData);
+    res = this->ReadField(this->m_allFileFields.size(), currData, false);
     if (res != ErrorCode::ERR_OK)
     {
         printf("Could not read field %u from backup!\n", index);
         return res;
     }
-    currData[GetFieldLength(index)] = 0;
+    currData.resize(GetFieldLength(index));
 
     // Write without backup, as it is already backed up
     res = this->WriteField(index, currData, false);
@@ -161,7 +162,7 @@ ErrorCode MemoryManager<N>::EraseField(const uint32_t index)
 
 
 template <uint32_t N>
-ErrorCode MemoryManager<N>::ReadField(const uint32_t index, std::string& o_buff)
+ErrorCode MemoryManager<N>::ReadField(const uint32_t index, std::string& o_buff, bool validateChecksum)
 {
     // Get field with headers to validate field
     const uint32_t fieldOffset = this->GetFieldOffsetInFile(index);
@@ -191,6 +192,12 @@ ErrorCode MemoryManager<N>::ReadField(const uint32_t index, std::string& o_buff)
     }
     o_buff[fieldSize] = 0;
 
+    // if we read from backup, we do not need to check checksum
+    if (!validateChecksum)
+    {
+        return ErrorCode::ERR_OK;
+    }
+
     // Check if checksum is valid
     if (static_cast<uint8_t>(field[FIELD_IS_DATA_VALID_INDEX]) != this->CalculateFieldChecksum(o_buff))
     {
@@ -202,7 +209,7 @@ ErrorCode MemoryManager<N>::ReadField(const uint32_t index, std::string& o_buff)
 }
 
 template <uint32_t N>
-ErrorCode MemoryManager<N>::WriteField(const uint32_t index, const std::string& buff, bool backup)
+ErrorCode MemoryManager<N>::WriteField(const uint32_t index, const std::string& buff, bool backup, bool doNotFinishWritingFlag)
 {
     const uint32_t fieldSize = this->GetFieldLength(index);
     
@@ -247,6 +254,11 @@ ErrorCode MemoryManager<N>::WriteField(const uint32_t index, const std::string& 
         return res;
     }
 
+    if (doNotFinishWritingFlag)
+    {
+        return ErrorCode::ERR_OK;
+    }
+    
     // Indicate that we finished writing field
     std::string writingDone{WRITING_DONE};
     res = this->m_fileManager->Write(fieldOffset + FIELD_WRITING_FLAG_INDEX, SIZE_OF_FLAG, writingDone);
