@@ -139,7 +139,30 @@ TEST(simpleTest, TestCorruptedField) {
     }
 }
 
+TEST(simpleTest, TestTwoCorruptedField) {
+    std::string aaaa {"aaaa"};
+    std::string bbbb {"bbbb"};
+    std::string cccc {"cccccccccc"};
+    std::string aaaa2{};
+    std::string emptyStr {"######"};
+    ASSERT_TRUE(memoryManager.WriteField(0, aaaa) == ErrorCode::ERR_OK);
+    for (size_t i = 0; i < aaaa2.size(); i++)
+    {
+        ASSERT_EQ(aaaa[i], aaaa2[i]);
+    }
+    ASSERT_TRUE(memoryManager.WriteField(0, bbbb, true, true) == ErrorCode::ERR_OK);
 
+    ASSERT_TRUE(memoryManager.WriteField(2, cccc, true, true) == ErrorCode::ERR_OK);
+    // Validate all fields also restores the corrupted field
+    memoryManager.ValidateAllFields();
+    ASSERT_TRUE(memoryManager.ReadField(0, aaaa) == ErrorCode::ERR_OK);
+    ASSERT_TRUE(memoryManager.ReadField(2, aaaa2) == ErrorCode::ERR_DATA_NOT_WRITTEN);
+
+    for (size_t i = 0; i < aaaa2.size(); i++)
+    {
+        ASSERT_EQ(aaaa[i], aaaa2[i]);
+    }
+}
 
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
