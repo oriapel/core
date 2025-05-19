@@ -9,7 +9,8 @@ enum ErrorCode : uint32_t
     ERR_GENERAL_ERROR = 1,
     ERR_DATA_NOT_WRITTEN = 2,
     ERR_DATA_CORRUPTED = 3,
-    ERR_FILE_PROBLEM = 4
+    ERR_FILE_PROBLEM = 4,
+    ERR_INVALID_INDEX = 5,
 };
 
 #endif // ERROR_CODES_H

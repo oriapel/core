@@ -75,6 +75,12 @@ void MemoryManager<N>::ValidateAllFields()
 template <uint32_t N>
 ErrorCode MemoryManager<N>::RestoreField(const uint32_t index)
 {
+    if (index > this->m_allFileFields.size())
+    {
+        printf("Invalid field index %u!\n", index);
+        return ErrorCode::ERR_INVALID_INDEX;
+    }
+
     std::string currData(this->m_biggestRecordSize, '\0');
 
     // Read backed up field from designated location
@@ -100,6 +106,12 @@ ErrorCode MemoryManager<N>::RestoreField(const uint32_t index)
 template <uint32_t N>
 ErrorCode MemoryManager<N>::BackUpField(const uint32_t index)
 {
+    if (index > this->m_allFileFields.size())
+    {
+        printf("Invalid field index %u!\n", index);
+        return ErrorCode::ERR_INVALID_INDEX;
+    }
+
     std::string currData(GetFieldLength(index), '\0');
 
     ErrorCode res = ErrorCode::ERR_OK;
@@ -127,6 +139,9 @@ inline uint32_t MemoryManager<N>::GetFieldLength(const uint32_t index) const
     {
         return this->m_allFileFields[index].fieldSize;
     }
+
+    // if we are in the backup field, we need to return the biggest record size
+    // if index is out of bounds, we return the biggest record size as well
     return this->m_biggestRecordSize;
 }
 
@@ -144,6 +159,12 @@ uint8_t MemoryManager<N>::CalculateFieldChecksum(const std::string &field) const
 template <uint32_t N>
 ErrorCode MemoryManager<N>::EraseField(const uint32_t index)
 {
+    if (index > this->m_allFileFields.size())
+    {
+        printf("Invalid field index %u!\n", index);
+        return ErrorCode::ERR_INVALID_INDEX;
+    }
+
     ErrorCode res = this->WriteField(index, std::string(this->m_allFileFields[index].fieldSize, '#'), false);
 
     if (res != ErrorCode::ERR_OK)
@@ -158,6 +179,12 @@ ErrorCode MemoryManager<N>::EraseField(const uint32_t index)
 template <uint32_t N>
 ErrorCode MemoryManager<N>::ReadField(const uint32_t index, std::string &o_buff, bool validateChecksum)
 {
+    if (index > this->m_allFileFields.size())
+    {
+        printf("Invalid field index %u!\n", index);
+        return ErrorCode::ERR_INVALID_INDEX;
+    }
+
     // Get field with headers to validate field
     const uint32_t fieldOffset = this->GetFieldOffsetInFile(index);
     const uint32_t fieldSize = this->GetFieldLength(index);
@@ -205,6 +232,12 @@ ErrorCode MemoryManager<N>::ReadField(const uint32_t index, std::string &o_buff,
 template <uint32_t N>
 ErrorCode MemoryManager<N>::WriteField(const uint32_t index, const std::string &buff, bool backup, bool doNotFinishWritingFlag)
 {
+    if (index > this->m_allFileFields.size())
+    {
+        printf("Invalid field index %u!\n", index);
+        return ErrorCode::ERR_INVALID_INDEX;
+    }
+
     const uint32_t fieldSize = this->GetFieldLength(index);
 
     // validate field size
@@ -301,6 +334,12 @@ bool MemoryManager<N>::ValidateTotalSizeOfFields()
 template <uint32_t N>
 uint32_t MemoryManager<N>::GetFieldOffsetInFile(const uint32_t index) const
 {
+    if (index > this->m_allFileFields.size())
+    {
+        printf("Invalid field index %u!\n", index);
+        return 0;
+    }
+
     uint32_t offset = 0;
     for (uint32_t i = 0; i < index; ++i)
     {
