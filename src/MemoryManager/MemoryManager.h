@@ -24,11 +24,17 @@ public:
     // C'tor
     MemoryManager(IFileManager *fileManager, std::array<FileFields, N> allFileFields) : m_fileManager(fileManager), m_allFileFields(allFileFields)
     {
+        // Save biggest record size
         UpdateBiggestRecordSize();
+
+        // Check if we have enough space for the fields
         if (!ValidateTotalSizeOfFields())
         {
+            // need to decide if failure here is exeption, need KAPAT for documentation
             printf("Fuck\n");
         }
+
+        // Check if there is a corrupted fields, and restore it
         ValidateAllFields();
     }
 
@@ -96,8 +102,8 @@ private:
     uint32_t GetFieldOffsetInFile(const uint32_t index) const;
 
 private:
-    uint32_t m_backUpRecordOffset{0};
-    uint32_t m_biggestRecordSize{0};
+    uint32_t m_backUpRecordOffset = 0;
+    uint32_t m_biggestRecordSize = 0;
     std::array<FileFields, N> m_allFileFields;
     IFileManager *m_fileManager;
 };

@@ -66,6 +66,8 @@ void MemoryManager<N>::ValidateAllFields()
             }
             else
             {
+                // Can throw an exception here, but I think it is not needed.
+                // outside of tests, this should not happen (Not possible due to the backup and restoration)
                 printf("OH NO!\ntoo many corrupted fields, all hope is lost\nnum of corrupted files: %u\n", invalidFieldsCounter);
             }
         }
