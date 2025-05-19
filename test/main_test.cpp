@@ -21,6 +21,16 @@ TEST(SimpleTest, WriteGoodField) {
     ASSERT_TRUE(memoryManager.WriteField(0, aaaa) == ErrorCode::ERR_OK);
 }
 
+TEST(SimpleTest, WriteFieldInvalidIndex) {
+    std::string aaaa {"aaaa"};
+    ASSERT_TRUE(memoryManager.WriteField(5, aaaa) == ErrorCode::ERR_INVALID_INDEX);
+}
+
+TEST(SimpleTest, ReadFieldInvalidIndex) {
+    std::string aaaa {"aaaa"};
+    ASSERT_TRUE(memoryManager.ReadField(5, aaaa) == ErrorCode::ERR_INVALID_INDEX);
+}
+
 TEST(SimpleTest, WriteWrongSizeField) {
     std::string aaaa {"aaaa"};
     ASSERT_TRUE(memoryManager.WriteField(1, aaaa) != ErrorCode::ERR_OK);
