@@ -18,7 +18,7 @@ ErrorCode FileManager::SeekFile(const uint32_t offset)
     return ErrorCode::ERR_OK;
 }
 
-ErrorCode FileManager::Read(const uint32_t offset, const uint32_t length, std::string& o_buff)
+ErrorCode FileManager::Read(const uint32_t offset, const uint32_t length, std::string &o_buff)
 {
     ErrorCode res = this->SeekFile(offset);
     if (res != ErrorCode::ERR_OK)
@@ -37,10 +37,10 @@ ErrorCode FileManager::Read(const uint32_t offset, const uint32_t length, std::s
         return ErrorCode::ERR_FILE_PROBLEM;
     }
 
-    return ErrorCode::ERR_OK;   
+    return ErrorCode::ERR_OK;
 }
 
-ErrorCode FileManager::Write(const uint32_t offset, const uint32_t length, const std::string& buff)
+ErrorCode FileManager::Write(const uint32_t offset, const uint32_t length, const std::string &buff)
 {
     ErrorCode res = this->SeekFile(offset);
     if (res != ErrorCode::ERR_OK)

@@ -13,18 +13,18 @@ ErrorCode MemoryManager<N>::InitalizeAllFields() const
     for (uint32_t i = 0; i < this->m_allFileFields.size(); ++i)
     {
         std::string emptyField((this->m_allFileFields[i].fieldSize), '#');
-        std::string emptyHeader{"##"};
+        std::string emptyHeader = "##";
         const uint32_t fieldOffset = this->GetFieldOffsetInFile(i);
         emptyHeader[FIELD_IS_DATA_VALID_INDEX] = this->CalculateFieldChecksum(emptyField);
         emptyHeader[FIELD_WRITING_FLAG_INDEX] = WRITING_DONE;
-        
+
         res = this->m_fileManager->Write(fieldOffset, INTERNAL_HEADER_SIZE, emptyHeader);
         if (res != ErrorCode::ERR_OK)
         {
             printf("Failed writing field %u to file!\n", i);
             return res;
         }
-        
+
         res = this->m_fileManager->Write(fieldOffset + INTERNAL_HEADER_SIZE, (this->m_allFileFields[i].fieldSize), emptyField);
         if (res != ErrorCode::ERR_OK)
         {
@@ -38,13 +38,13 @@ ErrorCode MemoryManager<N>::InitalizeAllFields() const
 template <uint32_t N>
 void MemoryManager<N>::ValidateAllFields()
 {
-    uint32_t invalidFieldsCounter= 0;
+    uint32_t invalidFieldsCounter = 0;
     for (uint32_t i = 0; i < this->m_allFileFields.size(); ++i)
     {
         // Get field with headers to validate field
         const uint32_t fieldOffset = this->GetFieldOffsetInFile(i);
-        std::string fieldHeaders{"##"};
-        
+        std::string fieldHeaders = "##";
+
         // Read field to validate data
         ErrorCode res = ErrorCode::ERR_OK;
         res = this->m_fileManager->Read(fieldOffset, INTERNAL_HEADER_SIZE, fieldHeaders);
@@ -69,7 +69,6 @@ void MemoryManager<N>::ValidateAllFields()
                 printf("OH NO!\ntoo many corrupted fields, all hope is lost\nnum of corrupted files: %u\n", invalidFieldsCounter);
             }
         }
-    
     }
 }
 
@@ -79,8 +78,7 @@ ErrorCode MemoryManager<N>::RestoreField(const uint32_t index)
     std::string currData(this->m_biggestRecordSize, '\0');
 
     // Read backed up field from designated location
-    ErrorCode res = ErrorCode::ERR_OK;
-    res = this->ReadField(this->m_allFileFields.size(), currData, false);
+    ErrorCode res = this->ReadField(this->m_allFileFields.size(), currData, false);
     if (res != ErrorCode::ERR_OK)
     {
         printf("Could not read field %u from backup!\n", index);
@@ -98,7 +96,6 @@ ErrorCode MemoryManager<N>::RestoreField(const uint32_t index)
 
     return ErrorCode::ERR_OK;
 }
-
 
 template <uint32_t N>
 ErrorCode MemoryManager<N>::BackUpField(const uint32_t index)
@@ -123,7 +120,6 @@ ErrorCode MemoryManager<N>::BackUpField(const uint32_t index)
     return ErrorCode::ERR_OK;
 }
 
-
 template <uint32_t N>
 inline uint32_t MemoryManager<N>::GetFieldLength(const uint32_t index) const
 {
@@ -134,12 +130,11 @@ inline uint32_t MemoryManager<N>::GetFieldLength(const uint32_t index) const
     return this->m_biggestRecordSize;
 }
 
-
 template <uint32_t N>
-uint8_t MemoryManager<N>::CalculateFieldChecksum(const std::string& field) const
+uint8_t MemoryManager<N>::CalculateFieldChecksum(const std::string &field) const
 {
     uint8_t checksum = 0;
-    for (const char& tmp : field)
+    for (const char &tmp : field)
     {
         checksum += static_cast<uint8_t>(tmp);
     }
@@ -160,18 +155,17 @@ ErrorCode MemoryManager<N>::EraseField(const uint32_t index)
     return ErrorCode::ERR_OK;
 }
 
-
 template <uint32_t N>
-ErrorCode MemoryManager<N>::ReadField(const uint32_t index, std::string& o_buff, bool validateChecksum)
+ErrorCode MemoryManager<N>::ReadField(const uint32_t index, std::string &o_buff, bool validateChecksum)
 {
     // Get field with headers to validate field
     const uint32_t fieldOffset = this->GetFieldOffsetInFile(index);
     const uint32_t fieldSize = this->GetFieldLength(index);
-    
+
     // Read field
-    std::string field{};
+    std::string field;
     ErrorCode res = this->m_fileManager->Read(fieldOffset, fieldSize + INTERNAL_HEADER_SIZE, field);
-    
+
     if (res != ErrorCode::ERR_OK)
     {
         printf("Failed reading field %u\n", index);
@@ -209,17 +203,17 @@ ErrorCode MemoryManager<N>::ReadField(const uint32_t index, std::string& o_buff,
 }
 
 template <uint32_t N>
-ErrorCode MemoryManager<N>::WriteField(const uint32_t index, const std::string& buff, bool backup, bool doNotFinishWritingFlag)
+ErrorCode MemoryManager<N>::WriteField(const uint32_t index, const std::string &buff, bool backup, bool doNotFinishWritingFlag)
 {
     const uint32_t fieldSize = this->GetFieldLength(index);
-    
+
     // validate field size
     if (buff.size() != fieldSize && (index != this->m_allFileFields.size()))
     {
         printf("Field %u does not match to field length! size is %lu, max size is %u\n", index, buff.size(), fieldSize);
         return ErrorCode::ERR_GENERAL_ERROR;
     }
-    
+
     // Write writing flag
     const uint32_t fieldOffset = this->GetFieldOffsetInFile(index);
     if (backup)
@@ -258,7 +252,7 @@ ErrorCode MemoryManager<N>::WriteField(const uint32_t index, const std::string& 
     {
         return ErrorCode::ERR_OK;
     }
-    
+
     // Indicate that we finished writing field
     std::string writingDone{WRITING_DONE};
     res = this->m_fileManager->Write(fieldOffset + FIELD_WRITING_FLAG_INDEX, SIZE_OF_FLAG, writingDone);
@@ -271,12 +265,11 @@ ErrorCode MemoryManager<N>::WriteField(const uint32_t index, const std::string& 
     return ErrorCode::ERR_OK;
 }
 
-
 template <uint32_t N>
 inline void MemoryManager<N>::UpdateBiggestRecordSize()
 {
-    uint32_t curr_max_val{0};
-    for (const auto& tmp : m_allFileFields)
+    uint32_t curr_max_val = 0;
+    for (const auto &tmp : m_allFileFields)
     {
         if (curr_max_val < tmp.fieldSize)
         {
@@ -289,8 +282,8 @@ inline void MemoryManager<N>::UpdateBiggestRecordSize()
 template <uint32_t N>
 bool MemoryManager<N>::ValidateTotalSizeOfFields()
 {
-    uint32_t totalSize{0};
-    for (const auto& tmp : m_allFileFields)
+    uint32_t totalSize = 0;
+    for (const auto &tmp : m_allFileFields)
     {
         totalSize += tmp.fieldSize + INTERNAL_HEADER_SIZE;
     }
@@ -308,7 +301,7 @@ bool MemoryManager<N>::ValidateTotalSizeOfFields()
 template <uint32_t N>
 uint32_t MemoryManager<N>::GetFieldOffsetInFile(const uint32_t index) const
 {
-    uint32_t offset{0};
+    uint32_t offset = 0;
     for (uint32_t i = 0; i < index; ++i)
     {
         offset += (m_allFileFields[i].fieldSize + INTERNAL_HEADER_SIZE);

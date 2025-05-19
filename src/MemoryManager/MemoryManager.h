@@ -9,8 +9,8 @@
 #include <array>
 
 // can add validation, not really important for the exercise
-static constexpr uint32_t MAX_FILE_PATH_LEN {20};
-static constexpr uint32_t MAX_FILE_CAPACITY {100}; // can be 4MB for exercise, does not really matter
+static constexpr uint32_t MAX_FILE_PATH_LEN{20};
+static constexpr uint32_t MAX_FILE_CAPACITY{100}; // can be 4MB for exercise, does not really matter
 static constexpr uint32_t INTERNAL_HEADER_SIZE{2};
 static constexpr uint32_t FIELD_WRITING_FLAG_INDEX{0};
 static constexpr uint32_t FIELD_IS_DATA_VALID_INDEX{1};
@@ -22,10 +22,10 @@ class MemoryManager
 {
 public:
     // C'tor
-    MemoryManager(IFileManager* fileManager, std::array<FileFields, N> allFileFields) : m_fileManager(fileManager), m_allFileFields(allFileFields)
+    MemoryManager(IFileManager *fileManager, std::array<FileFields, N> allFileFields) : m_fileManager(fileManager), m_allFileFields(allFileFields)
     {
         UpdateBiggestRecordSize();
-        if(!ValidateTotalSizeOfFields())
+        if (!ValidateTotalSizeOfFields())
         {
             printf("Fuck\n");
         }
@@ -35,12 +35,12 @@ public:
     /**
      * The function reads from the file into o_buff
      */
-    virtual ErrorCode ReadField(const uint32_t index, std::string& o_buff, bool validateChecksum = true);
+    virtual ErrorCode ReadField(const uint32_t index, std::string &o_buff, bool validateChecksum = true);
     /**
      * The function write to the file the content of buff.
      * DO NOT CHECK DATA INTEGRITY! I just added it so later I can add it fully, not interesting for now
      */
-    virtual ErrorCode WriteField(const uint32_t index, const std::string& buff, bool backup = true, bool doNotFinishWritingFlag = false);
+    virtual ErrorCode WriteField(const uint32_t index, const std::string &buff, bool backup = true, bool doNotFinishWritingFlag = false);
     /**
      * The funciton fill the memory of field in the file with zeros
      */
@@ -61,14 +61,13 @@ public:
      * This function calculate the checksum of field.
      * DID NOT ACTUALLY USED IT! can add if have time
      */
-    uint8_t CalculateFieldChecksum(const std::string& field) const;
+    uint8_t CalculateFieldChecksum(const std::string &field) const;
 
 private:
     /**
      * This function gets an index of field, and return the field's size
      */
     inline uint32_t GetFieldLength(const uint32_t index) const;
-
 
     /**
      * This function back up a filed before writing to it, to not lose the data in case of failure
@@ -100,7 +99,7 @@ private:
     uint32_t m_backUpRecordOffset{0};
     uint32_t m_biggestRecordSize{0};
     std::array<FileFields, N> m_allFileFields;
-    IFileManager* m_fileManager;
+    IFileManager *m_fileManager;
 };
 
 #include "MemoryManager.hpp"
